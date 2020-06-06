@@ -51,6 +51,12 @@ let rec generate (ops: op_t list): string list =
   | Push x :: rest_ops ->
       [Printf.sprintf ";; push %d" x;
        Printf.sprintf "push %d" x] @ generate rest_ops
+  | Plus :: Print :: rest_ops ->
+      [";; plus; print";
+       "pop rax";
+       "pop rbx";
+       "add rax, rbx";
+       "call print"]
   | Plus :: rest_ops ->
       [";; plus";
        "pop rax";
