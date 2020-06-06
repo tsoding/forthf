@@ -44,6 +44,10 @@ let gen_footer: string list = [
 
 let rec generate (ops: op_t list): string list =
   match ops with
+  | Push x :: Print :: rest_ops ->
+      [Printf.sprintf ";; push %d; print" x;
+       Printf.sprintf "mov rax, %d" x;
+       Printf.sprintf "call print"] @ generate rest_ops
   | Push x :: rest_ops ->
       [Printf.sprintf ";; push %d" x;
        Printf.sprintf "push %d" x] @ generate rest_ops
@@ -74,7 +78,7 @@ let () =
                   Print;
                   Print;
                   Print] in
-  let program_print_zero = [Push 0; Push 1; Push 2; Print; Print; Print] in
+  let program_print_zero = [Push 0; Print; Push 1; Print; Push 2; Print] in
   List.concat [gen_header;
                generate program_print_zero;
                gen_footer]
