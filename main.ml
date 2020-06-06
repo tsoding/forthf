@@ -42,21 +42,22 @@ let gen_footer: string list = [
     "ret";
     ";;; FOOTER END ;;;"]
 
-let gen_op op =
-  match op with
-  | Push x -> [Printf.sprintf ";; push %d" x;
-               Printf.sprintf "push %d" x]
-  | Plus -> [";; plus";
-             "pop rax";
-             "pop rbx";
-             "add rax, rbx";
-             "push rax"]
-  | Print -> [";; print";
-              "pop rax";
-              "call print"]
-
-let generate (ops: op_t list): string list =
-  ops |> List.map gen_op |> List.concat
+let rec generate (ops: op_t list): string list =
+  match ops with
+  | Push x :: rest_ops ->
+      [Printf.sprintf ";; push %d" x;
+       Printf.sprintf "push %d" x] @ generate rest_ops
+  | Plus :: rest_ops ->
+      [";; plus";
+       "pop rax";
+       "pop rbx";
+       "add rax, rbx";
+       "push rax"] @ generate rest_ops
+  | Print :: rest_ops ->
+      [";; print";
+       "pop rax";
+       "call print"] @ generate rest_ops
+  | [] -> []
 
 let parse_ops (source : string): op_t list = []
 
