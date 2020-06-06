@@ -63,23 +63,20 @@ let rec generate (ops: op_t list): string list =
        "call print"] @ generate rest_ops
   | [] -> []
 
-let parse_ops (source : string): op_t list = []
+let parse_ops (source : string): op_t list =
+  let not_empty x = String.length x != 0 in
+  source
+  |> String.split_on_char ' '
+  |> List.filter not_empty
+  |> List.map (fun x ->
+       match x with
+       | "." -> Print
+       | "+" -> Plus
+       | x   -> Push (int_of_string x))
 
 let () =
-  let program0 = [Push 1;
-                  Push 2;
-                  Push 3;
-                  Plus;
-                  Plus;
-                  Print] in
-  let program1 = [Push 1;
-                  Push 2;
-                  Push 3;
-                  Print;
-                  Print;
-                  Print] in
-  let program_print_zero = [Push 0; Print; Push 1; Print; Push 2; Print] in
+  let source = "1 2 3 + + ." in
   List.concat [gen_header;
-               generate program_print_zero;
+               source |> parse_ops |> generate;
                gen_footer]
   |> List.iter print_endline
